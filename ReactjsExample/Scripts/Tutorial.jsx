@@ -1,9 +1,24 @@
 ﻿var CommentBox = React.createClass({
+    loadCommentsFromServer:function(){
+        var seft = this;
+        $.get(this.props.url, function (comments) {
+            seft.setState({ data: comments });
+        });
+    },
+
+    getInitialState: function () {
+        return { data: [] };
+    },
+    //call after React rendered 
+    componentDidMount:function () {
+        window.setInterval(this.loadCommentsFromServer,this.props.pollInterval)
+    },
+
     render: function () {
         return (
       <div className="commentBox">
         <h1>Comments</h1>
-        <CommentList data={this.props.data} />
+        <CommentList data={this.state.data} />
         <CommentForm />
       </div>
     );
@@ -51,12 +66,7 @@ var CommentForm = React.createClass({
       );
     }
 });
-var data = [
-  { Author: "Daniel Lo Nigro", Text: "Hello ReactJS.NET World!" },
-  { Author: "Pete Hunt", Text: "This is one comment" },
-  { Author: "Jordan Walke", Text: "This is *another* comment" }
-];
 ReactDOM.render(
-  <CommentBox url="/comments" />,
+  <CommentBox url="/comments" pollInterval={2000} />,
   document.getElementById('content')
 );
